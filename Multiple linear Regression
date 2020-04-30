@@ -1,0 +1,68 @@
+from pandas import DataFrame
+import sklearn as s
+from sklearn import linear_model
+import statsmodels.api as sm
+import pandas as pd
+import matplotlib.pyplot as plt
+import statsmodels.formula.api as smf
+%matplotlib inline
+
+########################################################################################################
+fil = str(input("Enter Filename by using copy path in explorer: ")) #just copy path
+file = fil.replace('"','')
+dep = str(input('Enter dependant variable exactly as listed in dataset: '))
+columns = []
+modColumns = []
+count = 0
+while True:
+    ind = str(input('Enter the independant variable:'))
+    ans = str(input('Need to enter another independant variable?'))
+    ans = ans.lower()
+    count += 1
+    columns.append(ind)
+    modColumns.append(ind)
+    if ans == "yes":
+        modColumns.append(' + ')
+        count += 1
+        continue
+    else:
+        break
+model = (" ".join(modColumns))
+dependant = ("".join(dep))
+
+
+########################################################################################################
+#df = pd.read_csv("C:\\Users\\horowitz-b\\Documents\\Spring 2020\\MKTG 625 – Marketing Engineering\\Class 1 Jan 16 2020\JMP Mini-case_Data2.csv")
+#df = pd.read_csv(r'{}'.format(file)) # for use with file and copy path
+#df = pd.read_excel(r'C:\Users\horowitz-b\Documents\Spring 2020\MKTG 625 – Marketing Engineering\Final Exam\FInal Assignment Response Model 4 26 2020.xls')
+df = pd.read_excel(file)
+
+#columns = ['Advertising','Price','Competitor_Advertising']
+#x = df[['Advertising','Price','Competitor_Advertising']] # here we have 2 variables for multiple regression. If you just want to use one variable for simple linear regression, then use X = df['Interest_Rate'] for example.Alternatively, you may add additional variables within the brackets
+x = df[columns]
+y = df[dep]
+
+
+#for interactions
+#model_interaction = smf.ols(formula='Sales ~ Advertising + xrd + Price + Competitor_Advertising + xad:xrd', data=df).fit()
+#model_interaction = smf.ols(formula='Sales ~ Advertising + Price + Competitor_Advertising', data=df).fit()
+model_interaction = smf.ols(formula='{0} ~ {1}'.format(dependant,model), data=df).fit()
+summary = model_interaction.summary()
+summary.tables[1]
+
+
+    # with sklearn
+regr = linear_model.LinearRegression()
+regr.fit(x, y)
+
+print('Intercept: \n', regr.intercept_)
+print('Coefficients: \n', regr.coef_)
+
+X = sm.add_constant(x) # adding a constant
+ 
+model = sm.OLS(y, x).fit()
+predictions = model.predict(x) 
+ 
+print_model = model.summary()
+#print(print_model) # non interactions
+print(summary) #interaction
