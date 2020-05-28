@@ -1,0 +1,49 @@
+import statsmodels.api as sm
+import pandas as pd
+import statsmodels.formula.api as smf
+
+fil = str(input("Enter Filename by using copy path in explorer: "))
+file = fil.replace('"','')
+dep = str(input('Enter dependant variable exactly as listed in dataset: '))
+columns = []
+modColumns = []
+count = 0
+while True:
+    ind = str(input('Enter the independant variable:'))
+    ans = str(input('Need to enter another independant variable?'))
+    ans = ans.lower()
+    count += 1
+    columns.append(ind)
+    modColumns.append(ind)
+    if ans == "yes":
+        modColumns.append(' + ')
+        count += 1
+        continue
+    else:
+        break
+model = (" ".join(modColumns))
+dependant = ("".join(dep))
+
+df = pd.read_excel(file)
+
+x = df[columns]
+y = df[dep]
+
+model_interaction = smf.ols(formula='{0} ~ {1}'.format(dependant,model), data=df).fit()
+summary = model_interaction.summary()
+summary.tables[1]
+
+
+regr = linear_model.LinearRegression()
+regr.fit(x, y)
+
+print('Intercept: \n', regr.intercept_)
+print('Coefficients: \n', regr.coef_)
+
+X = sm.add_constant(x) # adding a constant
+ 
+model = sm.OLS(y, x).fit()
+predictions = model.predict(x) 
+ 
+print_model = model.summary()
+print(print_model) 
